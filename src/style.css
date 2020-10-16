@@ -1,0 +1,17 @@
+.playground {
+    margin: 0 auto;
+    width: 1080px;
+    height: 500px;
+}
+
+.radio {
+    margin: 5px;
+}
+
+.radio-label {
+    margin: 5px;
+}
+
+body {
+    background-color: #F8F9FA;
+}

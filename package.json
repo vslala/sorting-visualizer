@@ -13,6 +13,8 @@
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-scripts": "3.4.3",
+    "react-vis": "^1.11.7",
+    "react-vis-types": "0.0.6",
     "typescript": "^3.7.5"
   },
   "scripts": {
