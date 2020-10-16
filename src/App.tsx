@@ -1,24 +1,26 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import './style.css';
-import {VerticalBarSeries, XYPlot} from 'react-vis';
+import {useDispatch, useSelector} from "react-redux";
+import {VerticalBarSeries, XYPlot} from "react-vis";
 
 const width = 1080;
 const height = 400;
 
+const SORT = "SORT";
 const GREEN = "green";
 const BLACK = "black";
+const STEEL_BLUE = "steelblue";
+const YELLOW = "yellow";
 
 function App() {
 
-    const [bars, setBars] = useState<any>([]);
+    const bars: any = useSelector<any>(state => state.bars);
+    const dispatch = useDispatch();
+
     const [arraySize, setArraySize] = useState<number>(10);
     const [speed, setSpeed] = useState<number>(600);
     let delay: number = 0;
-
-    useEffect(() => {
-        setBars(refreshBars());
-    }, []);
 
     const refreshBars = () => {
         let arr = [];
@@ -34,31 +36,32 @@ function App() {
     }
 
     const refresh = () => {
+        console.log("refreshing...")
         delay = 0;
-        setBars(refreshBars());
+        dispatch({type: "REFRESH", payload: refreshBars()});
     }
 
-    const bubbleSort = async () => {
-        console.log("Bubble Sorting the array...");
+    const selectionSort = async () => {
+        console.log("Selection Sort the array...");
         let barsCopy = [...bars];
         for (let i = 0; i < barsCopy.length - 1; i++) {
             setTimeout(() => {
-                barsCopy[i].color = "steelblue";
-                setBars([...barsCopy]);
+                barsCopy[i].color = STEEL_BLUE;
+                dispatch({type: SORT, payload: [...barsCopy]});
             }, delay += speed);
 
             for (let j = i + 1; j < barsCopy.length; j++) {
                 setTimeout(() => {
-                    barsCopy[j].color = "yellow";
+                    barsCopy[j].color = YELLOW;
                     if (barsCopy[i].y > barsCopy[j].y) {
                         barsCopy[i].color = GREEN;
                         barsCopy[j].color = GREEN;
 
                         swap(barsCopy, i, j);
-                        setBars([...barsCopy]);
+                        dispatch({type: SORT, payload: [...barsCopy]});
                     }
 
-                    setBars([...barsCopy]);
+                    dispatch({type: SORT, payload: [...barsCopy]});
                     barsCopy[j].color = BLACK;
                 }, delay += speed);
 
@@ -66,20 +69,59 @@ function App() {
 
             setTimeout(() => {
                 barsCopy[i].color = BLACK;
-                setBars([...barsCopy]);
+                dispatch({type: SORT, payload: [...barsCopy]});
             }, delay += speed);
         }
 
         for (let i = 0; i < barsCopy.length; i++) {
             setTimeout(() => {
-                barsCopy[i].color = "steelblue";
-                setBars([...barsCopy]);
+                barsCopy[i].color = STEEL_BLUE;
+                dispatch({type: SORT, payload: [...barsCopy]});
             }, delay += speed);
         }
 
-        setBars([...barsCopy]);
+        dispatch({type: SORT, payload: [...barsCopy]});
     }
 
+    const bubbleSort = () => {
+        console.log("Bubble Sort the array...");
+        let arr = [...bars];
+        for (let i = 0; i < arr.length; i++) {
+            for (let j = 0; j < arr.length - i - 1; j++) {
+
+                setTimeout(() => {
+                    arr[j].color = STEEL_BLUE;
+                    arr[j + 1].color = YELLOW;
+                    dispatch({type: SORT, payload: [...arr]});
+                }, delay += speed);
+
+                setTimeout(() => {
+                    if (arr[j].y > arr[j + 1].y) {
+                        arr[j].color = GREEN;
+                        arr[j + 1].color = GREEN;
+                        swap(arr, j, j + 1);
+                        dispatch({type: SORT, payload: [...arr]});
+                    }
+                }, delay += speed);
+
+                setTimeout(() => {
+                    arr[j].color = BLACK;
+                    arr[j + 1].color = BLACK;
+                    dispatch({type: SORT, payload: [...arr]});
+                }, delay += speed);
+
+            }
+        }
+
+        for (let i = 0; i < arr.length; i++) {
+            setTimeout(() => {
+                arr[i].color = STEEL_BLUE;
+                dispatch({type: SORT, payload: [...arr]});
+            }, delay += speed);
+        }
+        console.log(arr);
+        // dispatch({type: SORT, payload: [...arr]});
+    }
 
     const swap = (arr: any, index1: number, index2: number) => {
         let temp = arr[index1].y;
@@ -114,10 +156,11 @@ function App() {
                     <label htmlFor="btn-group">Size</label><br/>
                     <div className="btn-group btn-group-sm">
                         {
-                            [...new Array(6)].map((val, index) => (<div>
-                                <input value={(index + 1) * 10} type="radio" id={`size_${index}`} name={"size"} className="radio"
+                            [...new Array(6)].map((val, index) => (<div key={index}>
+                                <input value={(index + 1) * 10} type="radio" id={`size_${index}`} name={"size"}
+                                       className="radio"
                                        checked={index + 1 === arraySize / 10}
-                                       onChange={(event)  => setArraySize(Number(event.currentTarget.value))}
+                                       onChange={(event) => setArraySize(Number(event.currentTarget.value))}
                                 /><br/>
                                 <label htmlFor={`size_${index}`} className={"radio-label"}>{(index + 1) * 10}</label>
                             </div>))
@@ -127,17 +170,20 @@ function App() {
                 <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
                     <label htmlFor="btn-group">Speed</label><br/>
                     {
-                        [...new Array(6)].map((val, index) => (<div>
-                            <input value={(6 - index)*100} type="radio" id={`speed_${index}`} name={"speed"} className="radio"
-                                   checked={(6 - index)*100 === speed}
-                                   onChange={(event)  => setSpeed(Number(event.currentTarget.value))}
+                        [...new Array(6)].map((val, index) => (<div key={index}>
+                            <input value={(6 - index) * 100} type="radio" id={`speed_${index}`} name={"speed"}
+                                   className="radio"
+                                   checked={(6 - index) * 100 === speed}
+                                   onChange={(event) => setSpeed(Number(event.currentTarget.value))}
                             /><br/>
                             <label htmlFor={`speed_${index}`} className={"radio-label"}>{index + 1}</label>
                         </div>))
                     }
                 </div>
                 <button type={"button"} className={"btn btn-outline-dark"} onClick={refresh}>Generate New Array</button>
-                <button type={"button"} className={"btn btn-outline-dark"} onClick={bubbleSort}>Selection Sort</button>
+                <button type={"button"} className={"btn btn-outline-dark"} onClick={selectionSort}>Selection Sort
+                </button>
+                <button type={"button"} className={"btn btn-outline-dark"} onClick={bubbleSort}>Bubble Sort</button>
             </nav>
         </>
 
