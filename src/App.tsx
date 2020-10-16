@@ -137,7 +137,7 @@ function App() {
                     }
                 </div>
                 <button type={"button"} className={"btn btn-outline-dark"} onClick={refresh}>Generate New Array</button>
-                <button type={"button"} className={"btn btn-outline-dark"} onClick={bubbleSort}>Bubble Sort</button>
+                <button type={"button"} className={"btn btn-outline-dark"} onClick={bubbleSort}>Selection Sort</button>
             </nav>
         </>
 
