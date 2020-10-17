@@ -20,6 +20,7 @@ function App() {
 
     const [arraySize, setArraySize] = useState<number>(10);
     const [speed, setSpeed] = useState<number>(600);
+    const [isRunning, setIsRunning] = useState<boolean>(false);
     let delay: number = 0;
 
     const refreshBars = () => {
@@ -36,12 +37,15 @@ function App() {
     }
 
     const refresh = () => {
+        setIsRunning(true);
         console.log("refreshing...")
         delay = 0;
         dispatch({type: "REFRESH", payload: refreshBars()});
+        setIsRunning(false);
     }
 
     const selectionSort = async () => {
+        setIsRunning(true);
         console.log("Selection Sort the array...");
         let barsCopy = [...bars];
         for (let i = 0; i < barsCopy.length - 1; i++) {
@@ -73,17 +77,17 @@ function App() {
             }, delay += speed);
         }
 
-        for (let i = 0; i < barsCopy.length; i++) {
-            setTimeout(() => {
-                barsCopy[i].color = STEEL_BLUE;
-                dispatch({type: SORT, payload: [...barsCopy]});
-            }, delay += speed);
-        }
+        paintSteelBlue(barsCopy);
+
+        setTimeout(() => {
+            setIsRunning(false);
+        }, delay += speed);
 
         dispatch({type: SORT, payload: [...barsCopy]});
     }
 
     const bubbleSort = () => {
+        setIsRunning(true);
         console.log("Bubble Sort the array...");
         let arr = [...bars];
         for (let i = 0; i < arr.length; i++) {
@@ -113,14 +117,68 @@ function App() {
             }
         }
 
+        paintSteelBlue(arr);
+
+        setTimeout(() => {
+            setIsRunning(false);
+        }, delay += speed);
+
+        console.log(arr);
+        // dispatch({type: SORT, payload: [...arr]});
+    }
+
+    function paintSteelBlue(arr: any[]) {
         for (let i = 0; i < arr.length; i++) {
             setTimeout(() => {
                 arr[i].color = STEEL_BLUE;
                 dispatch({type: SORT, payload: [...arr]});
             }, delay += speed);
         }
-        console.log(arr);
-        // dispatch({type: SORT, payload: [...arr]});
+    }
+
+    const insertionSort = () => {
+        setIsRunning(true);
+        let arr = [...bars];
+        for (let i = 0; i < arr.length; i++) {
+            setTimeout(() => {
+                arr[i].color = STEEL_BLUE;
+                dispatch({type: SORT, payload: [...arr]})
+            }, delay += speed);
+
+            for (let j = i; j > 0; j--) {
+                setTimeout(() => {
+                    arr[j - 1].color = YELLOW;
+                    dispatch({type: SORT, payload: [...arr]})
+                }, delay += speed);
+
+                setTimeout(() => {
+                    if (arr[j].y < arr[j - 1].y) {
+                        arr[j].color = GREEN;
+                        arr[j - 1].color = GREEN;
+                        swap(arr, j, j - 1);
+                        dispatch({type: SORT, payload: [...arr]});
+                    }
+                }, delay += speed);
+
+
+                setTimeout(() => {
+                    arr[j - 1].color = BLACK;
+                    dispatch({type: SORT, payload: [...arr]})
+                }, delay += speed);
+
+            }
+
+            setTimeout(() => {
+                arr[i].color = BLACK;
+                dispatch({type: SORT, payload: [...arr]})
+            }, delay += speed);
+        }
+
+        paintSteelBlue(arr);
+
+        setTimeout(() => {
+            setIsRunning(false);
+        }, delay += speed);
     }
 
     const swap = (arr: any, index1: number, index2: number) => {
@@ -159,6 +217,7 @@ function App() {
                             [...new Array(6)].map((val, index) => (<div key={index}>
                                 <input value={(index + 1) * 10} type="radio" id={`size_${index}`} name={"size"}
                                        className="radio"
+                                       disabled={isRunning}
                                        checked={index + 1 === arraySize / 10}
                                        onChange={(event) => setArraySize(Number(event.currentTarget.value))}
                                 /><br/>
@@ -173,6 +232,7 @@ function App() {
                         [...new Array(6)].map((val, index) => (<div key={index}>
                             <input value={(6 - index) * 100} type="radio" id={`speed_${index}`} name={"speed"}
                                    className="radio"
+                                   disabled={isRunning}
                                    checked={(6 - index) * 100 === speed}
                                    onChange={(event) => setSpeed(Number(event.currentTarget.value))}
                             /><br/>
@@ -180,10 +240,18 @@ function App() {
                         </div>))
                     }
                 </div>
-                <button type={"button"} className={"btn btn-outline-dark"} onClick={refresh}>Generate New Array</button>
-                <button type={"button"} className={"btn btn-outline-dark"} onClick={selectionSort}>Selection Sort
+                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
+                        onClick={refresh}>Generate New Array
                 </button>
-                <button type={"button"} className={"btn btn-outline-dark"} onClick={bubbleSort}>Bubble Sort</button>
+                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
+                        onClick={selectionSort}>Selection Sort
+                </button>
+                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
+                        onClick={bubbleSort}>Bubble Sort
+                </button>
+                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
+                        onClick={insertionSort}>Insertion Sort
+                </button>
             </nav>
         </>
 
