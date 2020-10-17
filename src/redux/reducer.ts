@@ -6,7 +6,7 @@ const initialState = {
     bars: []
 }
 
-const sortReducer = (state: any, action:any) => {
+const sortReducer = (state: any, action: any) => {
     switch (action.type) {
         case "REFRESH":
         case "SORT": {
@@ -15,7 +15,8 @@ const sortReducer = (state: any, action:any) => {
                 bars: action.payload
             }
         }
-        default: return initialState;
+        default:
+            return initialState;
     }
 }
 
