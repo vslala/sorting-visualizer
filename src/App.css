@@ -1,5 +1,6 @@
 .App {
     text-align: center;
+    width: 100%;
 }
 
 .App-logo {
@@ -44,4 +45,8 @@ p {
 
 h2 {
     font-family: "Arial Black";
+}
+
+.col button {
+    margin: auto;
 }

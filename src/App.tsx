@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './App.css';
 import './style.css';
 import {useDispatch, useSelector} from "react-redux";
-import {VerticalBarSeries, XYPlot} from "react-vis";
+import {FlexibleXYPlot, VerticalBarSeries} from "react-vis";
 
 const width = 1080;
 const height = 400;
@@ -21,6 +21,7 @@ function App() {
     const [arraySize, setArraySize] = useState<number>(10);
     const [speed, setSpeed] = useState<number>(600);
     const [isRunning, setIsRunning] = useState<boolean>(false);
+    const [isDisabled, setIsDisabled] = useState<boolean>(true);
     const [timeElapsed, setTimeElapsed] = useState<number>(0);
     const [info, setInfo] = useState<any>(<></>);
 
@@ -41,6 +42,7 @@ function App() {
 
     const refresh = () => {
         setIsRunning(true);
+        setIsDisabled(false);
         console.log("refreshing...")
         setTimeElapsed(0);
         dispatch({type: "REFRESH", payload: refreshBars()});
@@ -51,7 +53,7 @@ function App() {
         setIsRunning(true);
         let startTime = new Date().getTime();
         setInfo(<div>
-            <h2>Average Time Complexity: <strong>O(n²)</strong></h2><p>Bubble sort, sometimes referred to as sinking
+            <h2>ACC: <strong>O(n²)</strong></h2><p>Bubble sort, sometimes referred to as sinking
             sort,
             is a simple sorting algorithm that repeatedly steps through the list,
             compares adjacent elements and swaps them if they are in the wrong order.
@@ -100,7 +102,7 @@ function App() {
         setIsRunning(true);
         let startTime = new Date().getTime();
         setInfo(<div>
-            <h2>Average Time Complexity: <strong>O(n²)</strong></h2>
+            <h2>ACC: <strong>O(n²)</strong></h2>
             <p>Bubble sort, sometimes referred to as sinking sort,
                 is a simple sorting algorithm that repeatedly steps through the list,
                 compares adjacent elements and swaps them if they are in the wrong order.
@@ -151,7 +153,7 @@ function App() {
         setIsRunning(true);
         let startTime = new Date().getTime();
         setInfo(<div>
-            <h2>Average Time Complexity: <strong>O(n²)</strong></h2>
+            <h2>ACC: <strong>O(n²)</strong></h2>
             <p>Insertion sort is a simple sorting algorithm that builds the final sorted array one item at a time.
                 It is much less efficient on large lists than more advanced algorithms such as quicksort,
                 heapsort, or merge sort. </p>
@@ -197,7 +199,7 @@ function App() {
         setIsRunning(true);
         let startTime = new Date().getTime();
         setInfo(<div>
-            <h2>Average Time Complexity: <strong>O(n log n)</strong></h2>
+            <h2>ACC: <strong>O(n log n)</strong></h2>
             <p>Quicksort is an efficient sorting algorithm.
                 Developed by British computer scientist Tony Hoare in 1959 and published in 1961,
                 it is still a commonly used algorithm for sorting. When implemented well,
@@ -278,7 +280,7 @@ function App() {
         setIsRunning(true);
         let startTime = new Date().getTime();
         setInfo(<div>
-            <h2>Average Time Complexity: <strong>O(n log n)</strong></h2>
+            <h2>ACC: <strong>O(n log n)</strong></h2>
             <p>In computer science, merge sort is an efficient,
                 general-purpose, comparison-based sorting algorithm.
                 Most implementations produce a stable sort, which means
@@ -291,15 +293,15 @@ function App() {
         let length = arr.length;
         let aux: any[] = new Array(length);
         for (let arrSize = 1; arrSize < length; arrSize = 2 * arrSize) {
-            for (let low = 0; low < length - arrSize; low = low  + (2 * arrSize)) {
+            for (let low = 0; low < length - arrSize; low = low + (2 * arrSize)) {
                 let leftIndex = low;
                 let mid = low + arrSize;
                 let rightIndex = mid;
-                let end = Math.min(low + (2*arrSize), length);
+                let end = Math.min(low + (2 * arrSize), length);
                 let auxIndex = leftIndex;
 
                 arr[low].color = BLACK;
-                arr[end  - 1].color = BLACK;
+                arr[end - 1].color = BLACK;
                 dispatch({type: SORT, payload: [...arr]});
                 await wait(speed);
 
@@ -308,10 +310,10 @@ function App() {
                     else aux[auxIndex++] = arr[rightIndex++];
                 }
 
-                while (leftIndex <  mid) aux[auxIndex++] = arr[leftIndex++];
+                while (leftIndex < mid) aux[auxIndex++] = arr[leftIndex++];
                 while (rightIndex < end) aux[auxIndex++] = arr[rightIndex++];
 
-                for (let i=low; i < end; i++) {
+                for (let i = low; i < end; i++) {
                     arr[i] = aux[i];
                     arr[i].x = i;
 
@@ -352,15 +354,12 @@ function App() {
                 <div className="row">
                     <div className="col">
 
-                        <div className="App">
-                            <XYPlot
-                                width={width}
-                                height={height}
-                                colorType="literal"
-                            >
-                                <VerticalBarSeries data={bars} animation/>
-                            </XYPlot>
-                        </div>
+                        <FlexibleXYPlot
+                            height={height}
+                            colorType="literal"
+                        >
+                            <VerticalBarSeries data={bars} animation/>
+                        </FlexibleXYPlot>
 
                     </div>
                 </div>
@@ -368,62 +367,85 @@ function App() {
                     <div className="col">
                         {
                             timeElapsed > 0 ?
-                                <h1>Total Time Taken = {Math.round(timeElapsed / 1000)} seconds</h1> : <></>
+                                <h1>Time Taken = {Math.round(timeElapsed / 1000)} seconds</h1> : <></>
                         }
                         {info}
+                        <hr/>
                     </div>
                 </div>
+                <div className="row">
+                    <div className="col">
+                        <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+
+                            <label htmlFor="btn-group">Size</label><br/>
+                            <div className="btn-group btn-group-sm">
+                                {
+                                    [...new Array(6)].map((val, index) => (<div key={index}>
+                                        <input value={(index + 1) * 10} type="radio" id={`size_${index}`} name={"size"}
+                                               className="radio"
+                                               disabled={isRunning}
+                                               checked={index + 1 === arraySize / 10}
+                                               onChange={(event) => setArraySize(Number(event.currentTarget.value))}
+                                        /><br/>
+                                        <label htmlFor={`size_${index}`}
+                                               className={"radio-label"}>{(index + 1) * 10}</label>
+                                    </div>))
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col">
+                        <button type={"button"} disabled={isRunning} className={"btn btn-dark"}
+                                onClick={refresh}>Generate New Array
+                        </button>
+                    </div>
+                    <div className="col">
+                        <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+                            <label htmlFor="btn-group">Speed</label><br/>
+                            {
+                                [...new Array(6)].map((val, index) => (<div key={index}>
+                                    <input value={(6 - index) * 100} type="radio" id={`speed_${index}`} name={"speed"}
+                                           className="radio"
+                                           disabled={isRunning}
+                                           checked={(6 - index) * 100 === speed}
+                                           onChange={(event) => setSpeed(Number(event.currentTarget.value))}
+                                    /><br/>
+                                    <label htmlFor={`speed_${index}`} className={"radio-label"}>{index + 1}</label>
+                                </div>))
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+                            <button type={"button"} disabled={isRunning || isDisabled}
+                                    className={"btn btn-outline-dark"}
+                                    onClick={selectionSort}>Selection Sort
+                            </button>
+                            <button type={"button"} disabled={isRunning || isDisabled}
+                                    className={"btn btn-outline-dark"}
+                                    onClick={bubbleSort}>Bubble Sort
+                            </button>
+                            <button type={"button"} disabled={isRunning || isDisabled}
+                                    className={"btn btn-outline-dark"}
+                                    onClick={insertionSort}>Insertion Sort
+                            </button>
+                            <button type={"button"} disabled={isRunning || isDisabled}
+                                    className={"btn btn-outline-dark"}
+                                    onClick={quickSortOrchestrator}>Quick Sort
+                            </button>
+                            <button type={"button"} disabled={isRunning || isDisabled}
+                                    className={"btn btn-outline-dark"}
+                                    onClick={mergeSort}>Merge Sort
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
             </div>
-            <nav className="navbar fixed-bottom navbar-light bg-light ">
+            <nav className="navbar fixed-top navbar-light bg-light ">
                 <div className="navbar-brand">Sorting Visualizer</div>
-                <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
-                    <label htmlFor="btn-group">Size</label><br/>
-                    <div className="btn-group btn-group-sm">
-                        {
-                            [...new Array(6)].map((val, index) => (<div key={index}>
-                                <input value={(index + 1) * 10} type="radio" id={`size_${index}`} name={"size"}
-                                       className="radio"
-                                       disabled={isRunning}
-                                       checked={index + 1 === arraySize / 10}
-                                       onChange={(event) => setArraySize(Number(event.currentTarget.value))}
-                                /><br/>
-                                <label htmlFor={`size_${index}`} className={"radio-label"}>{(index + 1) * 10}</label>
-                            </div>))
-                        }
-                    </div>
-                </div>
-                <div className="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
-                    <label htmlFor="btn-group">Speed</label><br/>
-                    {
-                        [...new Array(6)].map((val, index) => (<div key={index}>
-                            <input value={(6 - index) * 100} type="radio" id={`speed_${index}`} name={"speed"}
-                                   className="radio"
-                                   disabled={isRunning}
-                                   checked={(6 - index) * 100 === speed}
-                                   onChange={(event) => setSpeed(Number(event.currentTarget.value))}
-                            /><br/>
-                            <label htmlFor={`speed_${index}`} className={"radio-label"}>{index + 1}</label>
-                        </div>))
-                    }
-                </div>
-                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
-                        onClick={refresh}>Generate New Array
-                </button>
-                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
-                        onClick={selectionSort}>Selection Sort
-                </button>
-                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
-                        onClick={bubbleSort}>Bubble Sort
-                </button>
-                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
-                        onClick={insertionSort}>Insertion Sort
-                </button>
-                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
-                        onClick={quickSortOrchestrator}>Quick Sort
-                </button>
-                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
-                        onClick={mergeSort}>Merge Sort
-                </button>
             </nav>
         </>
 
