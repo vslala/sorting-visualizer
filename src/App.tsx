@@ -34,6 +34,8 @@ function App() {
                 color: BLACK
             });
         }
+
+        console.log(arr);
         return arr;
     }
 
@@ -49,10 +51,12 @@ function App() {
         setIsRunning(true);
         let startTime = new Date().getTime();
         setInfo(<div>
-            <h2>Average Time Complexity: <strong>O(n²)</strong></h2><p>Bubble sort, sometimes referred to as sinking sort,
+            <h2>Average Time Complexity: <strong>O(n²)</strong></h2><p>Bubble sort, sometimes referred to as sinking
+            sort,
             is a simple sorting algorithm that repeatedly steps through the list,
             compares adjacent elements and swaps them if they are in the wrong order.
-            The pass through the list is repeated until the list is sorted.</p><p>In computer science, selection sort is an in-place comparison sorting algorithm.
+            The pass through the list is repeated until the list is sorted.</p><p>In computer science, selection sort is
+            an in-place comparison sorting algorithm.
             It has an O(n²) time complexity, which makes it inefficient on large lists,
             and generally performs worse than the similar insertion sort</p>
         </div>);
@@ -98,9 +102,9 @@ function App() {
         setInfo(<div>
             <h2>Average Time Complexity: <strong>O(n²)</strong></h2>
             <p>Bubble sort, sometimes referred to as sinking sort,
-            is a simple sorting algorithm that repeatedly steps through the list,
-            compares adjacent elements and swaps them if they are in the wrong order.
-            The pass through the list is repeated until the list is sorted.</p>
+                is a simple sorting algorithm that repeatedly steps through the list,
+                compares adjacent elements and swaps them if they are in the wrong order.
+                The pass through the list is repeated until the list is sorted.</p>
         </div>)
 
         let arr = [...bars];
@@ -270,6 +274,61 @@ function App() {
 
     }
 
+    const mergeSort = async () => {
+        setIsRunning(true);
+        let startTime = new Date().getTime();
+        setInfo(<div>
+            <h2>Average Time Complexity: <strong>O(n log n)</strong></h2>
+            <p>In computer science, merge sort is an efficient,
+                general-purpose, comparison-based sorting algorithm.
+                Most implementations produce a stable sort, which means
+                that the order of equal elements is the same in the input and output.
+                Merge sort is a divide and conquer algorithm that was invented by John von Neumann in 1945.
+            </p>
+        </div>)
+
+        let arr = [...bars];
+        let length = arr.length;
+        let aux: any[] = new Array(length);
+        for (let arrSize = 1; arrSize < length; arrSize = 2 * arrSize) {
+            for (let low = 0; low < length - arrSize; low = low  + (2 * arrSize)) {
+                let leftIndex = low;
+                let mid = low + arrSize;
+                let rightIndex = mid;
+                let end = Math.min(low + (2*arrSize), length);
+                let auxIndex = leftIndex;
+
+                arr[low].color = BLACK;
+                arr[end  - 1].color = BLACK;
+                dispatch({type: SORT, payload: [...arr]});
+                await wait(speed);
+
+                while (leftIndex < mid && rightIndex < end) {
+                    if (less(arr, leftIndex, rightIndex)) aux[auxIndex++] = arr[leftIndex++];
+                    else aux[auxIndex++] = arr[rightIndex++];
+                }
+
+                while (leftIndex <  mid) aux[auxIndex++] = arr[leftIndex++];
+                while (rightIndex < end) aux[auxIndex++] = arr[rightIndex++];
+
+                for (let i=low; i < end; i++) {
+                    arr[i] = aux[i];
+                    arr[i].x = i;
+
+                    arr[i].color = GREEN;
+                    dispatch({type: SORT, payload: [...arr]});
+                    await wait(speed);
+                }
+            }
+        }
+
+
+        await paintSteelBlue(arr);
+        setIsRunning(false);
+        setTimeElapsed(new Date().getTime() - startTime);
+
+    }
+
     const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
     const randomNumber = (min: number, max: number) => {
@@ -361,6 +420,9 @@ function App() {
                 </button>
                 <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
                         onClick={quickSortOrchestrator}>Quick Sort
+                </button>
+                <button type={"button"} disabled={isRunning} className={"btn btn-outline-dark"}
+                        onClick={mergeSort}>Merge Sort
                 </button>
             </nav>
         </>
