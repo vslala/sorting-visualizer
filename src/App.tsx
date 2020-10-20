@@ -350,6 +350,9 @@ function App() {
 
     return (
         <>
+            <nav className="navbar navbar-light bg-light ">
+                <div className="navbar-brand">Sorting Visualizer</div>
+            </nav>
             <div className="container">
                 <div className="row">
                     <div className="col">
@@ -444,9 +447,7 @@ function App() {
                 </div>
                 <hr/>
             </div>
-            <nav className="navbar fixed-top navbar-light bg-light ">
-                <div className="navbar-brand">Sorting Visualizer</div>
-            </nav>
+
         </>
 
     );
