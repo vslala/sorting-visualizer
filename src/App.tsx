@@ -370,7 +370,12 @@ function App() {
                     <div className="col">
                         {
                             timeElapsed > 0 ?
-                                <h1>Time Taken = {Math.round(timeElapsed / 1000)} seconds</h1> : <></>
+                                <>
+                                    <h1>Time Taken = {Math.round(timeElapsed / 1000)} seconds</h1>
+                                    <p className={"text-muted"}><i>Note: This time is just a relative animation time
+                                        just for the purpose of visualization. Actual computation on the given
+                                        array size takes nanoseconds.</i></p>
+                                </>: <></>
                         }
                         {info}
                         <hr/>
